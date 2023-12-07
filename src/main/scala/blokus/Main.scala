@@ -10,5 +10,4 @@ object Main {
     val tui = new Tui(controller)
     tui.inputLoop()
   }
-  
 }

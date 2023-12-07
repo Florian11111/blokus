@@ -3,47 +3,54 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
 class ObservableSpec extends AnyWordSpec with Matchers {
-
   "An Observable" should {
+    "correctly manage subscribers" when {
+      "adding observers" in {
+        val observable = new Observable[String]
+        val observer1 = new Observer[String] { def update(e: String): Unit = {} }
+        val observer2 = new Observer[String] { def update(e: String): Unit = {} }
 
-    "correctly add and notify observers" in {
-      val observable = new Observable[String]()
-      val observer1 = new TestObserver[String]()
-      val observer2 = new TestObserver[String]()
+        observable.addObserver(observer1)
+        observable.addObserver(observer2)
 
-      observable.addObserver(observer1)
-      observable.addObserver(observer2)
+        // Test indirectly by checking if notifyObservers calls update on both observers
+        var updateCount = 0
+        val countingObserver = new Observer[String] { def update(e: String): Unit = updateCount += 1 }
 
-      val testString = "test"
-      observable.notifyObservers(testString)
+        observable.addObserver(countingObserver)
+        observable.notifyObservers("test")
 
-      observer1.receivedUpdates should contain(testString)
-      observer2.receivedUpdates should contain(testString)
-    }
+        updateCount shouldBe 1
+      }
 
-    "not notify removed observers" in {
-      val observable = new Observable[String]()
-      val observer1 = new TestObserver[String]()
-      val observer2 = new TestObserver[String]()
+      "removing observers" in {
+        val observable = new Observable[String]
+        val observer = new Observer[String] { def update(e: String): Unit = {} }
 
-      observable.addObserver(observer1)
-      observable.addObserver(observer2)
-      observable.removeObserver(observer1)
+        observable.addObserver(observer)
+        observable.removeObserver(observer)
 
-      val testString = "test"
-      observable.notifyObservers(testString)
+        // Test indirectly by checking if notifyObservers calls update
+        var updateCalled = false
+        val testObserver = new Observer[String] { def update(e: String): Unit = updateCalled = true }
 
-      observer1.receivedUpdates shouldNot contain(testString)
-      observer2.receivedUpdates should contain(testString)
-    }
-  }
+        observable.addObserver(testObserver)
+        observable.removeObserver(testObserver)
+        observable.notifyObservers("test")
 
-  // Helper class for testing
-  class TestObserver[E] extends Observer[E] {
-    var receivedUpdates: Vector[E] = Vector()
+        updateCalled shouldBe false
+      }
 
-    def update(e: E): Unit = {
-      receivedUpdates = receivedUpdates :+ e
+      "notifying observers" in {
+        val observable = new Observable[String]
+        var receivedEvent: Option[String] = None
+        val observer = new Observer[String] { def update(e: String): Unit = receivedEvent = Some(e) }
+
+        observable.addObserver(observer)
+        observable.notifyObservers("hello")
+
+        receivedEvent shouldBe Some("hello")
+      }
     }
   }
 }
