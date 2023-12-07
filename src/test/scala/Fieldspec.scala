@@ -1,84 +1,138 @@
-import blokus.models.Field
+package blokus.models
+
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 
 class FieldSpec extends AnyWordSpec with Matchers {
 
-  "Field" should {
+  "Field Object" should {
+    "create a new Field instance with the given dimensions" in {
+      val width = 5
+      val height = 5
+      val field = Field.getInstance(width, height)
 
-    "calculate width correctly" in {
-      val field = Field(5, 4)
-      field.width shouldBe 5
+      field.width shouldBe width
+      field.height shouldBe height
     }
 
-    "be initialized with correct dimensions" in {
-      val field = Field(5, 4)
-      field.width shouldBe 5
-      field.height shouldBe 4
-      field.getFieldVector shouldBe Vector.fill(4, 5)(-1)
-    }
+    "return the same Field instance upon subsequent calls" in {
+      val width = 5
+      val height = 5
+      val field1 = Field.getInstance(width, height)
+      val field2 = Field.getInstance(width, height)
 
-    "validate positions correctly" in {
-      val field = Field(5, 5)
-      field.isValidPosition(List((0, 0)), 2, 2) shouldBe true
-      field.isValidPosition(List((0, 0), (1, 0)), 4, 4) shouldBe false // block goes out of bounds
-      field.isValidPosition(List((0, 0), (-1, -1)), 0, 0) shouldBe false // block goes out of bounds
-      // ... more cases
+      field2 should be theSameInstanceAs(field1)
     }
+  }
 
-    "place block correctly" in {
-      val field = Field(5, 5)
-      val newField = field.placeBlock(List((0, 0)), 2, 2, 0)
-      newField.getFieldVector(2)(2) shouldBe 0
-      // ... more cases, including edge cases
-    }
+  "A Field" when {
+    "initialized" should {
+      val width = 5
+      val height = 5
+      val field = Field(width, height)
 
-    "throw exception for invalid block placement" in {
-      val field = Field(5, 5)
-      a[IllegalArgumentException] shouldBe thrownBy {
-        field.placeBlock(List((0, 0), (1, 0)), 4, 4, 0) // block goes out of bounds
+      "have the correct dimensions" in {
+        field.width shouldBe width
+        field.height shouldBe height
       }
-      // ... more cases for invalid placements
+
+      "be zero for an empty field" in {
+        val emptyField = new Field(Vector.empty[Vector[Int]])
+        emptyField.width shouldBe 0
+      }
+
+      "countPlayerNumbers" should {
+        "return the fixed number of players" in {
+          val field = Field(5, 5)
+          field.countPlayerNumbers() shouldBe 3
+        }
+      }
+
+      "be empty" in {
+        field.getFieldVector.foreach { row =>
+          row should contain only -1
+        }
+      }
     }
 
-    "update field correctly when placing a block" in {
-      val fielde = Field(5, 5)
-      val newFielde = fielde.placeBlock(List((0, 0), (1, 0)), 2, 2, 0)
+    "checking for valid positions" should {
+      val field = Field(5, 5)
 
-      newFielde.getFieldVector shouldBe Vector(
-        Vector(-1, -1, -1, -1, -1),
-        Vector(-1, -1, -1, -1, -1),
-        Vector(-1, -1,  0,  0, -1),
-        Vector(-1, -1, -1,  -1, -1),
-        Vector(-1, -1, -1, -1, -1)
-      )
+      "return true for valid positions" in {
+        field.isValidPosition(List((0, 0), (1, 1)), 2, 2) shouldBe true
+      }
+
+      "return false for invalid positions" in {
+        field.isValidPosition(List((0, 0), (1, 6)), 2, 2) shouldBe false
+      }
     }
 
-    "calculate width based on fieldVector" in {
-      val field = Field(5, 4)
-      field.width shouldBe 5
+    "checking game over conditions" should {
+      "return true if the game is over" in {
+        val field3 = Field(5, 5)
+        // Assuming game over logic, for example, no more valid positions
+        // Setup the field to a state that represents game over
+        // Example:
+        field3.placeBlock(List((0, 0), (1, 0)), 2, 2, 1)
 
-      val emptyField = Field(0, 0)
-      emptyField.width shouldBe 0
+        field3.isGameOver(List((1, 1)), 3, 3, 1) shouldBe true
+      }
+
+      "return false if the game is not over" in {
+        var field2 = Field(5, 5)
+        // Setup field to a state that does not represent game over
+        // Example:
+        field2 = field2.placeBlock(List((0, 0)), 2, 2, 1)
+
+        field2.isGameOver(List((1, 1)), 1, 1, 1) shouldBe false
+      }
     }
-  }
-  "Field object" should {
-    "create a new Field instance with the given dimensions using apply method" in {
-      val field = Field.apply(5, 5)
-      field.width shouldBe 5
-      field.height shouldBe 5
-      // Additional assertions as needed
+
+    "placing a block" should {
+      "correctly update the field" in {
+        val field = Field(5, 5)
+        val newField = field.placeBlock(List((0, 0), (1, 0)), 2, 2, 1)
+
+        newField.getFieldVector(2)(2) shouldBe 1
+        newField.getFieldVector(2)(3) shouldBe 1
+      }
+
+      "throw an exception for invalid placement" in {
+        val field = Field(5, 5)
+
+        an[IllegalArgumentException] should be thrownBy field.placeBlock(List((0, 0), (6, 6)), 2, 2, 1)
+      }
     }
-  }
 
-  "creating a copy" should {
-    "produce an identical copy of the field" in {
-      val field = Field.getInstance(4, 5)
-      val copiedField = field.copy()
+    "checking for valid placements" should {
+      "return true for a valid placement" in {
+        val field = Field(5, 5)
+        // Example setup where placement is valid
+        // Example:
+        field.placeBlock(List((0, 0)), 1, 1, 1)
 
-      assert(field.width == copiedField.width)
-      assert(field.height == copiedField.height)
-      assert(field.getFieldVector == copiedField.getFieldVector)
+        field.isValidPlace(List((1, 1)), 2, 2, 1) shouldBe true
+      }
+
+      "return false for an invalid placement" in {
+        var field6 = Field(5, 5)
+        // Place a block at (2, 2) for player 1
+        field6 = field6.placeBlock(List((0, 0)), 2, 2, 1)
+
+        // Attempt to place another block at the same position for player 2
+        // This should be invalid due to overlap
+        field6.isValidPlace(List((0, 0)), 2, 2, 2) shouldBe false
+      }
+    }
+
+    "copying the field" should {
+      "create a deep copy" in {
+        val field = Field(5, 5)
+        val copyField = field.copy()
+
+        copyField should not be theSameInstanceAs(field)
+        copyField.getFieldVector shouldBe field.getFieldVector
+      }
     }
   }
 }

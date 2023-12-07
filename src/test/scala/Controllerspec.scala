@@ -46,7 +46,7 @@ class ControllerSpec extends AnyWordSpec with Matchers {
 
     "set a new block type correctly" in {
       val newBlockType = 2
-      controller.setzen(newBlockType)
+      controller.place(newBlockType)
       controller.getBlock() shouldBe controller.hoverBlock.getBlock()
       // Optionally check if observers are notified after setting a new block
     }
@@ -59,8 +59,10 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       val controllertest = new Controller(playerAmount, firstBlockType, width, height)
       val initialField = controllertest.getField()
 
+      controllertest.changePlayer(2)
+
       // Perform a move or action to create a command
-      controllertest.setzen(1) shouldBe a[scala.util.Success[_]] // Assuming this is a valid move
+      controllertest.place(1) shouldBe a[scala.util.Success[_]] // Assuming this is a valid move
 
       // Check if undo and redo work correctly
       controllertest.undo() shouldBe a[scala.util.Success[_]]
@@ -74,26 +76,26 @@ class ControllerSpec extends AnyWordSpec with Matchers {
       controllertest.redo() shouldBe a[scala.util.Failure[_]]
     }
 
-    "check if canSetzen() returns correct result" in {
+    "check if canPlace() returns correct result" in {
       val playerAmount = 4
       val firstBlockType = 2
       val width = 10
       val height = 10
       val test4controller = new Controller(playerAmount, firstBlockType, width, height)
 
-      // Assuming your logic for "canSetzen" depends on the state of hoverBlock and field,
+      // Assuming your logic for "canPlace" depends on the state of hoverBlock and field,
       // you should configure the state to test different cases
 
-      // Test when it's possible to setzen
-      test4controller.canSetzten() shouldBe true
-      test4controller.setzen(2) // Set a block type
-      test4controller.canSetzten() shouldBe false
+      // Test when it's possible to place
+      test4controller.canPlace() shouldBe true
+      test4controller.place(2) // Set a block type
+      test4controller.canPlace() shouldBe false
 
-      // Test when it's not possible to setzen
+      // Test when it's not possible to place
       // For example, when the hoverBlock is in an invalid position
       // You need to configure your controller's state accordingly
       // controller.move(0) // Move to an invalid position
-      // controller.canSetzten() shouldBe false
+      // controller.canPlace() shouldBe false
     }
 
     "change the player correctly with nextPlayer()" in {

@@ -60,13 +60,13 @@ class HoverBlockSpec extends AnyWordSpec with Matchers {
 
     "set block correctly" in {
       val newBlockType = 2
-      val newField = hoverBlock.setzen(testField, newBlockType)
+      val newField = hoverBlock.place(testField, newBlockType)
       // Assert the block is set correctly on the field
       // Assert hoverBlock's state is reset to initial values
     }
 
     "determine if a block can be placed correctly" in {
-      hoverBlock.canSetzen(testField) shouldBe true
+      hoverBlock.canPlace(testField) shouldBe true
     }
   }
 

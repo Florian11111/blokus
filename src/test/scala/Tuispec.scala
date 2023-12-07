@@ -21,7 +21,7 @@ class TestObserver extends Observer[ControllerEvent] {
 class TuiSpec extends AnyWordSpec {
   "A Tui" when {
     "initialized with a controller" should {
-      val controller = new Controller(1, 5, 5, 5) // Setup the controller
+      val controller = new Controller(2, 5, 5, 5) // Setup the controller
       val tui = new Tui(controller) // Instantiate Tui with the controller
       val testObserver = new TestObserver() // Test observer to capture Tui output
       controller.addObserver(testObserver) // Add test observer to controller
@@ -59,7 +59,7 @@ class TuiSpec extends AnyWordSpec {
         controller.changePlayer(1)
         controller.move(2)
         controller.move(2)
-        controller.setzen(5)
+        controller.place(5)
 
         val expectedMergedField = Vector(
             Vector(-1, -1, 1, 1, 1),
@@ -78,7 +78,7 @@ class TuiSpec extends AnyWordSpec {
         //controller.move(1) shouldBe
         //controller.rotate() shouldBe
         //controller.mirror() shouldBe
-        //controller.setzen(2) shouldBe
+        //controller.place(2) shouldBe
         // Simulate user inputs such as 'w', 'a', 's', 'd', 'r', 'm'
         // You can do this by calling the methods on the controller that these inputs would trigger
         // For each input, check that the Tui's state or output updates as expected

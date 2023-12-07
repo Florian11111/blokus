@@ -17,11 +17,8 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
     def place(newBlock: Int): Try[Unit] = execute(SetBlockCommand(this, field, getCurrentPlayer(), newBlock))
 
     def place_2(neuerTyp: Int): Unit = {
-        val randomBlock = blockInventory.getRandomBlock(getCurrentPlayer())
-        randomBlock.foreach(block => {
-        field = hoverBlock.place(field, block)
+        field = hoverBlock.place(field, neuerTyp)
         notifyObservers(ControllerEvent.Update)
-        })
     }
 
     def getBlocks(): List[Int] = blockInventory.getBlocks(getCurrentPlayer())
@@ -127,24 +124,23 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
 	}
 
     private class SetBlockCommand(controller: Controller, newField: Field, player: Int, blockTyp: Int) extends Command {
-        private val originalField = controller.field
-        private val originalBlocks = controller.blockInventory.getBlocks(player)
+    private val originalField = controller.field
+    private val originalInventoryState = controller.blockInventory.getCompleteInventory()
 
-        override def execute(): Try[Unit] = Try {
-            controller.place_2(blockTyp)
-        }
-
-        override def undo(): Unit = {
-            controller.field = originalField
-            controller.changePlayer(player)
-            controller.blockInventory = new BlockInventory(player, initialCount = 0) // Setze die Blocks zurück auf 0
-            originalBlocks.foreach(block => controller.blockInventory.useBlock(player, block))
-            controller.changeBlock(blockTyp)
-            notifyObservers(ControllerEvent.Update)
-        }
-
-        override def redo(): Try[Unit] = execute()
+    override def execute(): Try[Unit] = Try {
+        controller.place_2(blockTyp)
     }
+
+    override def undo(): Unit = {
+        controller.field = originalField
+        controller.blockInventory.setCompleteInventory(originalInventoryState)
+        controller.changePlayer(player)
+        notifyObservers(ControllerEvent.Update)
+    }
+
+    override def redo(): Try[Unit] = execute()
+}
+
 }
 
 
