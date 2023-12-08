@@ -95,6 +95,23 @@ class Tui(controller: Controller) extends Observer[ControllerEvent] {
             case ControllerEvent.PlayerChange(player) =>
         }
     }
+   def handleNumericInput(input: String): Unit = {
+    if (input.matches("""\d+""")) {
+      val blockIndex = input.toInt
+      if (blockIndex >= 0 && blockIndex <= 19) {
+        val blocks = controller.getBlocks()
+        if (blocks(blockIndex) > 0) {
+          controller.changeCurrentBlock(blockIndex)
+        } else {
+          println("Block nicht mehr verfuegbar!")
+        }
+      } else {
+        println("Wahle Block Zwischen 0 und 19!")
+      }
+    } else {
+      println("Bitte eine Zahl eingeben!")
+    }
+  }
 
     def inputLoop(): Unit = {
         try {
@@ -102,26 +119,27 @@ class Tui(controller: Controller) extends Observer[ControllerEvent] {
             var continue = true
             while (continue) {
                 val input = scala.io.StdIn.readLine()
-                input match {
-                    case "x" => continue = false
-                    case "w" => controller.move(2)
-                    case "d" => controller.move(1)
-                    case "s" => controller.move(0)
-                    case "a" => controller.move(3)
-                    case "u" => controller.undo()
-                    case "r" => controller.rotate()
-                    case "m" => controller.mirror()
-                    case "e" => {
+                val parts = input.split(" ")
+                parts match {
+                    case Array("x") => continue = false
+                    case Array("w") => controller.move(2)
+                    case Array("d") => controller.move(1)
+                    case Array("s") => controller.move(0)
+                    case Array("a") => controller.move(3)
+                    case Array("u") => controller.undo()
+                    case Array("r") => controller.rotate()
+                    case Array("m") => controller.mirror()
+                    case Array("e") => {
                         if (controller.canPlace()) {
-                            controller.place(5)
+                            controller.place(5) // Assuming 5 is a valid block type
                             controller.nextPlayer()
                         } else {
-                            println("Kann nicht an dieser Stelle Platziert werden!")
+                            println("Kann nicht an dieser Stelle platziert werden!")
                         }
                     }
-                    case _ =>
+                    case Array("c", number) => handleNumericInput(number)
+                    case _ => println("Ungueltiger Befehl")
                 }
-
             }
         } finally {
             // Reset any terminal configurations if needed

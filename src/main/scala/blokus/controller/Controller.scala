@@ -22,8 +22,12 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
     }
 
     def place_2(neuerTyp: Int): Unit = {
-        field = hoverBlock.place(field, neuerTyp)
+        blockInventory.useBlock(getCurrentPlayer(), hoverBlock.getCurrentBlock)
+        val randomBlock = blockInventory.getRandomBlock(getCurrentPlayer())
+        randomBlock.foreach(block => {
+        field = hoverBlock.place(field, block)
         notifyObservers(ControllerEvent.Update)
+        })
     }
 
     def getBlocks(): List[Int] = blockInventory.getBlocks(getCurrentPlayer())
@@ -152,7 +156,6 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
 
     override def redo(): Try[Unit] = execute()
 }
-
 }
 
 
