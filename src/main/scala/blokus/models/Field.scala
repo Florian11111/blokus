@@ -14,10 +14,6 @@ class Field(private val fieldVector: Vector[Vector[Int]]) {
     }
     }
 
-    def countPlayerNumbers(): Int = {
-        3
-    }
-
     def isGameOver(block: List[(Int, Int)], x: Int, y: Int, currentPlayer: Int): Boolean = {
         if (!isValidPosition(block, x, y) || !block.forall { case (dx, dy) => fieldVector(y + dy)(x + dx) == -1 }) {
             false

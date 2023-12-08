@@ -26,7 +26,6 @@ class BlockInventory(playerAmount: Int, initialCount: Int = 1) {
             if (availableBlocks.nonEmpty) {
             val randomIndex = Random.nextInt(availableBlocks.length)
             val randomBlock = availableBlocks(randomIndex)
-            useBlock(spielerNumber, randomBlock)
             Some(randomBlock)
         } else {
             throw new RuntimeException(s"No Block is available for Player $spielerNumber.")
@@ -51,7 +50,22 @@ class BlockInventory(playerAmount: Int, initialCount: Int = 1) {
         }
     }
 
-    def getAvailableBlocks(spielerNumber: Int): List[Int] = {
-        inventories(spielerNumber).indices.filter(isAvailable(spielerNumber, _)).toList
+    def deepCopy: BlockInventory = {
+        val copy = new BlockInventory(playerAmount)
+        for {
+        player <- 0 until playerAmount
+        block <- 0 until inventories(player).length
+        } {
+        copy.inventories(player)(block) = inventories(player)(block)
+        }
+        copy
+    }
+
+    private def getAvailableBlocks(spielerNumber: Int): List[Int] = {
+        if (inventories.length > spielerNumber && inventories(spielerNumber).nonEmpty) {
+            inventories(spielerNumber).indices.filter(isAvailable(spielerNumber, _)).toList
+        } else {
+            List.empty
+        }
     }
 }

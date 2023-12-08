@@ -13,10 +13,15 @@ class HoverBlock(playerAmount: Int, firstBlock: Int) {
     def getY(): Int = currentY
     def getRotation(): Int = rotation
     def getCurrentPlayer: Int = currentPlayer
+    def getCurrentBlock: Int = currentBlockTyp
     def getBlock(): List[(Int, Int)] = {
         Block.createBlock(currentBlockTyp, rotation, mirrored).map { case (x, y) => (x + currentX, y + currentY) }
     }
 
+    def setCurrentBlock(newBlock: Int): Int = {
+        currentBlockTyp = newBlock
+        currentBlockTyp
+    }
     def changePlayer(): Int = {
         currentPlayer = (currentPlayer + 1) % playerAmount
         currentPlayer
@@ -26,6 +31,24 @@ class HoverBlock(playerAmount: Int, firstBlock: Int) {
         val prevPlayer = currentPlayer
         currentPlayer = newPlayer
         prevPlayer
+    }
+
+    def getOutOfCorner(fieldHeight: Int, fieldWight: Int): Boolean = {
+        if (currentX < 2) {
+            currentX = 2
+            true
+        } else if ((currentX > fieldWight - 2)) {
+            currentX = fieldWight - 2
+            true
+        } else if (currentY < 2) {
+            currentY = 2
+            true
+        } else if ((currentY > fieldHeight - 2)) {
+            currentY = fieldHeight - 2
+            true
+        } else {
+            false
+        }
     }
 
     def move(feld: Field, richtung: Int): Boolean = {
@@ -92,7 +115,6 @@ class HoverBlock(playerAmount: Int, firstBlock: Int) {
 
     // Setzt den Block an der aktuellen Position
     def place(feld: Field, newBlockTyp: Int): Field = {
-
         val temp = feld.placeBlock(Block.createBlock(currentBlockTyp, rotation, mirrored), currentX, currentY, currentPlayer)
         currentX = 2
         currentY = 2

@@ -14,7 +14,12 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
     var hoverBlock = HoverBlock(playerAmount, firstBlock)
     var blockInventory = new BlockInventory(playerAmount)
 
-    def place(newBlock: Int): Try[Unit] = execute(SetBlockCommand(this, field, getCurrentPlayer(), newBlock))
+    def getWidth(): Int = width
+    def getHeight(): Int = height
+
+    def place(newBlock: Int): Try[Unit] = {
+        execute(SetBlockCommand(this, field, getCurrentPlayer(), hoverBlock.getCurrentBlock))
+    }
 
     def place_2(neuerTyp: Int): Unit = {
         field = hoverBlock.place(field, neuerTyp)
@@ -25,6 +30,7 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
 
     def changeCurrentBlock(newBlock: Int): Try[Unit] = Try {
         hoverBlock.currentBlockTyp = newBlock
+        hoverBlock.getOutOfCorner(height, width)
         notifyObservers(ControllerEvent.Update)
     }
 
@@ -33,6 +39,12 @@ class Controller(playerAmount: Int, firstBlock: Int, width: Int, height: Int) ex
     def getField(): Vector[Vector[Int]] = field.getFieldVector
 
     def getBlock(): List[(Int, Int)] = hoverBlock.getBlock()
+
+    def setCurrentBlock(newBlock: Int): Int = {
+        val temp = hoverBlock.setCurrentBlock(newBlock)
+        notifyObservers(ControllerEvent.Update)
+        temp
+    }
 
     def move(richtung: Int): Boolean = {
         val moved = hoverBlock.move(field, richtung)
