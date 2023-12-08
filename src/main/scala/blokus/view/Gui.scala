@@ -16,10 +16,10 @@ import scalafx.application.Platform
 class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends JFXApp3 with Observer[ControllerEvent] {
     controller.addObserver(this)
 
-    private var boardPane: GridPane = _
-    private var currentPlayerLabel: Label = _
-    private var blocksLabel: Label = _
-    private var numberTextField: TextField = _
+    var boardPane: GridPane = _
+    var currentPlayerLabel: Label = _
+    var blocksLabel: Label = _
+    var numberTextField: TextField = _
 
     override def start(): Unit = {
         stage = new JFXApp3.PrimaryStage {
@@ -49,7 +49,7 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
                 boardPane = new GridPane {}
 
                 children.add(boardPane)
-                
+
                 // Erstelle eine HBox für die Buttons
                 val buttonBox1 = new HBox {
                     spacing = 10
