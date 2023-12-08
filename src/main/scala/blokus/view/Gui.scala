@@ -13,7 +13,6 @@ import scalafx.scene.shape.Rectangle
 import scalafx.application.Platform
 
 
-
 class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends JFXApp3 with Observer[ControllerEvent] {
     controller.addObserver(this)
 
@@ -35,7 +34,7 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
 
     def createScene(): Scene = {
         new Scene {
-            fill = Color.LightGreen
+            fill = Color.web("#333333",1)
             content = new VBox {
                 spacing = 10
                 alignment = scalafx.geometry.Pos.Center
@@ -47,13 +46,10 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
                 blocksLabel = new Label(controller.getBlocks().toString)
                 children.add(blocksLabel)
 
-                // Initialisiere boardPane hier
-                boardPane = new GridPane {
-                    // Konfiguriere die GridPane nach Bedarf
-                }
+                boardPane = new GridPane {}
 
                 children.add(boardPane)
-
+                
                 // Erstelle eine HBox für die Buttons
                 val buttonBox1 = new HBox {
                     spacing = 10
@@ -62,26 +58,32 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
 
                 // Füge 6 Buttons hinzu und weise ihnen eine Funktion zu
                 val button1 = new Button(s"Hoch")
+                styleButton(button1)
                 button1.onAction = _ => handleButtonAction(0)
                 buttonBox1.children.add(button1)
 
                 val button2 = new Button(s"Runter")
+                styleButton(button2)
                 button2.onAction = _ => handleButtonAction(1)
                 buttonBox1.children.add(button2)
 
                 val button3 = new Button(s"Links")
+                styleButton(button3)
                 button3.onAction = _ => handleButtonAction(2)
                 buttonBox1.children.add(button3)
 
                 val button4 = new Button(s"Rechts")
+                styleButton(button4)
                 button4.onAction = _ => handleButtonAction(3)
                 buttonBox1.children.add(button4)
 
                 val button5 = new Button(s"Spiegeln")
+                styleButton(button5)
                 button5.onAction = _ => handleButtonAction(4)
                 buttonBox1.children.add(button5)
 
                 val button6 = new Button(s"Drehen")
+                styleButton(button6)
                 button6.onAction = _ => handleButtonAction(5)
                 buttonBox1.children.add(button6)
 
@@ -94,14 +96,17 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
                 }
 
                 val button7 = new Button(s"Setzten")
+                styleButton(button7)
                 button7.onAction = _ => handleButtonAction(6)
                 buttonBox2.children.add(button7)
 
                 val button8 = new Button(s"Undo")
+                styleButton(button8)
                 button8.onAction = _ => handleButtonAction(7)
                 buttonBox2.children.add(button8)
 
                 val button9 = new Button(s"BlockWechseln")
+                styleButton(button9)
                 button9.onAction = _ => handleButtonAction(8)
                 buttonBox2.children.add(button9)
 
@@ -112,6 +117,31 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
 
                 children.add(buttonBox2)
             }
+        }
+    }
+
+    def styleButton(button: Button): Unit = {
+        button.style = "-fx-font-size: 10pt;" +
+        "-fx-background-color: #a6a6a6, linear-gradient(#aaaaaa, #808080)," +
+        "linear-gradient(#aaaaaa 0%, #808080 50%, #666666 51%, #757575 100%);" +
+        "-fx-background-radius: 6, 5;" +
+        "-fx-background-insets: 0, 1;" +
+        "-fx-text-fill: black;" +
+        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 1);"
+    }
+
+
+    def createButtonBox(buttonLabels: Seq[String]): HBox = {
+        new HBox {
+        spacing = 10
+        alignment = scalafx.geometry.Pos.Center
+
+        for ((label, index) <- buttonLabels.zipWithIndex) {
+            val button = new Button(label)
+            button.onAction = _ => handleButtonAction(index)
+            button.styleClass = Seq("rounded-button")
+            children.add(button)
+        }
         }
     }
 
@@ -171,7 +201,7 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
             row.zipWithIndex.map { case (fieldValue, columnIndex) =>
                 block.find { case (x, y) =>
                     x == columnIndex && y == rowIndex
-                }.map(_ => if (fieldValue != -1) 20 + controller.getCurrentPlayer() else 10).getOrElse(fieldValue)
+                }.map(_ => if (fieldValue != -1) 11 else 20 + controller.getCurrentPlayer()).getOrElse(fieldValue)
             }
         }
         merged
@@ -193,13 +223,6 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
         }
     }
 
-    object Color2 extends Enumeration {
-        val DarkRed = Value("#8B0000")
-        val DarkBlue = Value("#00008B")
-        val DarkYellow = Value("#FFD700")
-        val Default = Value("#000000")
-    }
-
     def getFillColor(value: Int): Color = {
         value match {
             case -1 => Color.White
@@ -211,14 +234,21 @@ class Gui(controller: Controller, windowsWidth: Int, windowsHeight: Int) extends
             case 11 => Color.LightGray
             case 20 => Color.web("#8b0000",1)
             case 21 => Color.web("#006400",1)
-            case 22 => Color.web("#9B870C",1)
-            case 23 => Color.web("#0000FF",1)
+            case 22 => Color.web("#000088",1)
+            case 23 => Color.web("#9B870C",1)
             case _ => Color.Black
         }
     }
 
     def updateLabels(): Unit = {
-        currentPlayerLabel.text = s"Current Player: ${controller.getCurrentPlayer() + 1}"
-        blocksLabel.text = s"Blocks: ${controller.getBlocks()}"
+        val currentPlayerLabelText = s"Current Player: ${controller.getCurrentPlayer() + 1}"
+        val blocksLabelText = s"Blocks: ${controller.getBlocks()}"
+
+        currentPlayerLabel.text = currentPlayerLabelText
+        blocksLabel.text = blocksLabelText
+
+        // Ändere die Textfarbe und den Hintergrund der Labels
+        currentPlayerLabel.style = "-fx-text-fill: white;" // oder eine andere gewünschte Farbe
+        blocksLabel.style = "-fx-text-fill: white;" // oder eine andere gewünschte Farbe
     }
 }
