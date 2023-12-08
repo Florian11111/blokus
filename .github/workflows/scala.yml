@@ -7,7 +7,7 @@ name: Scala CI
 
 on:
   push:
-    branches: [ "main", "coveralls" ]
+    branches: [ "main", "coveralls", "the-great-merge" ]
   pull_request:
     branches: [ "main", "coveralls" ]
 
