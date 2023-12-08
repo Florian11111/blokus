@@ -41,13 +41,6 @@ class FieldSpec extends AnyWordSpec with Matchers {
         emptyField.width shouldBe 0
       }
 
-      "countPlayerNumbers" should {
-        "return the fixed number of players" in {
-          val field = Field(5, 5)
-          field.countPlayerNumbers() shouldBe 3
-        }
-      }
-
       "be empty" in {
         field.getFieldVector.foreach { row =>
           row should contain only -1

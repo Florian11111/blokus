@@ -61,7 +61,7 @@ class BlockInventory(playerAmount: Int, initialCount: Int = 1) {
         copy
     }
 
-    private def getAvailableBlocks(spielerNumber: Int): List[Int] = {
+    def getAvailableBlocks(spielerNumber: Int): List[Int] = {
         if (inventories.length > spielerNumber && inventories(spielerNumber).nonEmpty) {
             inventories(spielerNumber).indices.filter(isAvailable(spielerNumber, _)).toList
         } else {

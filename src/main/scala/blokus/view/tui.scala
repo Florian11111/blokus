@@ -29,15 +29,34 @@ class Tui(controller: Controller) extends Observer[ControllerEvent] {
   private var currentState: TuiState = new DefaultTuiState()
   controller.addObserver(this)
 
+  def clearTerminal(): Unit = {
+    val os = System.getProperty("os.name").toLowerCase()
+    if (os.contains("win")) {
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor()
+    } else {
+        print("\u001b[H\u001b[2J")
+        System.out.flush()
+        }
+    }
+
   def processInput(input: String): Unit = {
     currentState.processInput(input, controller)
   }
 
   def display(): Unit = {
-    println("Blokus Game")
     println(mergeFieldAndBlock().map(rowToString).mkString("\n"))
-    println("\nPlayer: " + (controller.getCurrentPlayer() + 1))
-    println("Controls: w/a/s/d to move, r to rotate, m to mirror, e to place, u to undo, x to exit")
+    //printf("bloecke: ", controller.getBlocks())
+    println("\nBloecke:")
+    print(controller.getBlocks())
+    println("\nPlayer:")
+    print(controller.getCurrentPlayer() + 1)
+    println("\nSteuerung:")
+    println("w/a/s/d: Block bewegen")
+    println("r: Block rotieren")
+    println("m: Block spiegeln")
+    println("s: Block platzieren")
+    println("u: Undo")
+    println("x: Beenden")
   }
 
   def mergeFieldAndBlock(): Vector[Vector[Int]] = {
@@ -68,20 +87,45 @@ class Tui(controller: Controller) extends Observer[ControllerEvent] {
   }
 
   override def update(event: ControllerEvent): Unit = {
-    event match {
-      case ControllerEvent.Update => display()
-      case ControllerEvent.PlayerChange(player) =>
-    }
-  }
+        clearTerminal()
+        display()
 
-  def inputLoop(): Unit = {
-    var continue = true
-    display()
-    while (continue) {
-      val input = scala.io.StdIn.readLine()
-      processInput(input)
-      if (input == "x") continue = false
+        event match {
+            case ControllerEvent.Update =>
+            case ControllerEvent.PlayerChange(player) =>
+        }
     }
-  }
+
+    def inputLoop(): Unit = {
+        try {
+            display()
+            var continue = true
+            while (continue) {
+                val input = scala.io.StdIn.readLine()
+                input match {
+                    case "x" => continue = false
+                    case "w" => controller.move(2)
+                    case "d" => controller.move(1)
+                    case "s" => controller.move(0)
+                    case "a" => controller.move(3)
+                    case "u" => controller.undo()
+                    case "r" => controller.rotate()
+                    case "m" => controller.mirror()
+                    case "e" => {
+                        if (controller.canPlace()) {
+                            controller.place(5)
+                            controller.nextPlayer()
+                        } else {
+                            println("Kann nicht an dieser Stelle Platziert werden!")
+                        }
+                    }
+                    case _ =>
+                }
+
+            }
+        } finally {
+            // Reset any terminal configurations if needed
+        }
+    }
 }
 
