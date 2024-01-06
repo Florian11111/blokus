@@ -23,7 +23,7 @@ class Tui(controller: GameController) extends Observer[Event] {
     def mergeFieldAndBlock(): Vector[Vector[Int]] = {
         val field = controller.getField()
         val block = controller.getBlock()
-        
+
         field.zipWithIndex.map { case (row, rowIndex) =>
             row.zipWithIndex.map { case (fieldValue, columnIndex) =>
             block.find { case (x, y) =>
@@ -59,9 +59,9 @@ class Tui(controller: GameController) extends Observer[Event] {
         println("w/a/s/d: Block bewegen")
         println("r: Block rotieren")
         println("m: Block spiegeln")
-        println("s: Block platzieren")
+        println("e: Block platzieren")
         println("u: Undo")
-        println("x: Beenden")   
+        println("x: Beenden")
     }
 
     override def update(event: Event): Unit = {
@@ -76,12 +76,12 @@ class Tui(controller: GameController) extends Observer[Event] {
                 printEndGame()
             }
             case ExitEvent => System.exit(0)
-            case _ => 
+            case _ =>
         }
         if (gameisStarted) {
             clearTerminal()
             display()
-            displayControlls()   
+            displayControlls()
         }
     }
 
@@ -93,7 +93,7 @@ class Tui(controller: GameController) extends Observer[Event] {
             println("Player " + (i + 1) + ": " + results(i))
         }
         val winner = results.indexOf(results.max)
-        println("Player " + (winner + 1) + " has won!")    
+        println("Player " + (winner + 1) + " has won!")
         println("new Game? (n)")
         println("Close? (x)")
     }
@@ -108,9 +108,9 @@ class Tui(controller: GameController) extends Observer[Event] {
                 controller.exit()
             } else if (input == "n") {
                 controller.start(controller.getPlayerAmount(), controller.getWidth(), controller.getHeight())
-            } 
+            }
         }
-        
+
         if (!gameisStarted) {
             println("Blokus")
             println("Anzahl Spieler: ")
@@ -123,7 +123,7 @@ class Tui(controller: GameController) extends Observer[Event] {
             controller.start(playerCount, fieldSizeX, fieldSizeY)
         }
         print("test?")
-        try { 
+        try {
             val input = scala.io.StdIn.readLine()
             input match {
                 case "x" => controller.exit()
@@ -143,7 +143,7 @@ class Tui(controller: GameController) extends Observer[Event] {
                 }
                 case _ =>
             }
-            
+
         } finally {
             // Reset any terminal configurations if needed
         }
