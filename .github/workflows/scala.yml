@@ -7,7 +7,7 @@ name: Scala CI
 
 on:
   push:
-    branches: [ "main", "coveralls", "Befor-Gui-Finish-(Arthur-will-weiterarbeiten)"]
+    branches: [ "main", "coveralls", "Befor-Gui-Finish-(Arthur-will-weiterarbeiten)", "final-alles-kaputt"]
   pull_request:
     branches: [ "main", "coveralls", "Befor-Gui-Finish-(Arthur-will-weiterarbeiten)" ]
 
